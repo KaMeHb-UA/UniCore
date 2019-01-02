@@ -1,18 +1,18 @@
-const { spawn } = require('child_process'),
-    yarnFullPath = `${__dirname}/node_modules/.bin/yarn${process.platform == 'win32' ? '.cmd' : ''}`,
+const yarn = require('./modules/yarn'),
     parts = [
         'proton',
         'react-native',
     ];
 
-function spawnYarn(dir){
-    return new Promise((resolve, reject) => {
-        spawn(yarnFullPath, {
+async function spawnYarn(dir){
+    try{
+        await yarn({
             cwd: `${__dirname}/${dir}`
-        }).on('exit', code => {
-            if(code) reject(new Error(`Failed to install/build ${dir} with code ${code}`)); else resolve()
-        })
-    })
+        });
+        console.log(`Modules for ${dir} installed/built successfully`)
+    } catch (e){
+        throw new Error(`Failed to install/build ${dir} with code ${e}`)
+    }
 }
 
 function partsToSentence(parts){
@@ -23,8 +23,6 @@ function partsToSentence(parts){
 
 console.log(`Installing needed modules for ${partsToSentence(parts)}...`)
 
-Promise.all(parts.map(dir => spawnYarn(dir).then(() => {
-    console.log(`Modules for ${dir} installed/built successfully`)
-}))).then(() => {
+Promise.all(parts.map(dir => spawnYarn(dir))).then(() => {
     console.log('All done')
 })
