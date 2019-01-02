@@ -21,8 +21,10 @@ function partsToSentence(parts){
     return newParts.join(', ') + ' and ' + lastPart
 }
 
-console.log('Installing needed modules for ' + partsToSentence(parts))
+console.log(`Installing needed modules for ${partsToSentence(parts)}...`)
 
-Promise.all(parts.map(dir => spawnYarn(dir))).then(() => {
+Promise.all(parts.map(dir => spawnYarn(dir).then(() => {
+    console.log(`Modules for ${dir} installed/built successfully`)
+}))).then(() => {
     console.log('All done')
 })
